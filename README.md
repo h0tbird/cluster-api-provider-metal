@@ -2,7 +2,7 @@
 Bare metal CAPI provider
 
 ## Development
-Initial project scaffolding:
+Initial project scaffolding with kubebuilder `2.3.1`:
 ```
 go mod init github.com/h0tbird/cluster-api-provider-metal
 kubebuilder init --domain cluster.x-k8s.io --license apache2 --owner "Marc Villacorta"
@@ -10,14 +10,14 @@ kubebuilder create api --group infrastructure --version v1alpha1 --kind BareMeta
 kubebuilder create api --group infrastructure --version v1alpha1 --kind BareMetalMachine
 ```
 
-Patch the Makefile and generate the CRDs:
+Patch the Makefile and generate the CRDs with controller-gen `0.2.8`:
 ```
 gsed -i 's/controller-gen@v0.2.5/controller-gen@v0.2.8/g' Makefile
 gsed -i 's/trivialVersions=true/crdVersions=v1/g' Makefile
 rm -f $(which controller-gen) && make manifests
 ```
 
-Install CRDs into a cluster:
+Install the CRDs into the cluster:
 ```
 make install
 kubectl apply -f config/samples
