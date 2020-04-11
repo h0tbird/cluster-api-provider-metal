@@ -1,3 +1,7 @@
 domain: cluster.x-k8s.io
 repo: github.com/h0tbird/cluster-api-provider-metal
+resources:
+- group: infrastructure
+  kind: BareMetalCluster
+  version: v1alpha1
 version: "2"
