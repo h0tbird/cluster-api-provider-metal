@@ -39,6 +39,8 @@ type BareMetalClusterStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 
 // BareMetalCluster is the Schema for the baremetalclusters API
 type BareMetalCluster struct {

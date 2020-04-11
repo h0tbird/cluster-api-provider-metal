@@ -12,9 +12,9 @@ kubebuilder create api --group infrastructure --version v1alpha3 --kind BareMeta
 
 Patch and generate the CRDs with controller-gen `0.2.8`:
 ```
-gsed '0,/+kubebuilder:object:root=true/s##&\
+gsed -i '0,/+kubebuilder:object:root=true/s##&\
 // +kubebuilder:subresource:status\
-// +kubebuilder:storageversion\#' api/v1alpha3/*_types.go
+// +kubebuilder:storageversion#' api/v1alpha3/*_types.go
 gsed -i 's/controller-gen@v0.2.5/controller-gen@v0.2.8/g' Makefile
 gsed -i 's/trivialVersions=true/crdVersions=v1/g' Makefile
 rm -f $(which controller-gen) && make manifests
