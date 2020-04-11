@@ -10,4 +10,7 @@ resources:
 - group: infrastructure
   kind: BareMetalCluster
   version: v1alpha3
+- group: infrastructure
+  kind: BareMetalMachine
+  version: v1alpha3
 version: "2"
