@@ -38,6 +38,7 @@ type BareMetalClusterStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
+// +kubebuilder:subresource:status
 // +kubebuilder:object:root=true
 
 // BareMetalCluster is the Schema for the baremetalclusters API

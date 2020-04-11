@@ -38,6 +38,7 @@ type BareMetalMachineStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
+// +kubebuilder:subresource:status
 // +kubebuilder:object:root=true
 
 // BareMetalMachine is the Schema for the baremetalmachines API
