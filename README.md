@@ -16,3 +16,14 @@ Install CRDs into a cluster:
 make install
 kubectl apply -f config/samples
 ```
+
+Setup CAPI tilt:
+```
+cat > tilt-settings.json << EOF
+{
+  "default_registry": "localhost:5000",
+  "provider_repos": ["../cluster-api-provider-metal"],
+  "enable_providers": ["metal", "kubeadm-bootstrap", "kubeadm-control-plane"]
+}
+EOF
+```
