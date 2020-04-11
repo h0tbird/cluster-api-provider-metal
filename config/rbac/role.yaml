@@ -11,38 +11,38 @@ rules:
   resources:
   - baremetalclusters
   verbs:
+  - create
+  - delete
   - get
   - list
-  - watch
-  - create
-  - update
   - patch
-  - delete
+  - update
+  - watch
 - apiGroups:
   - infrastructure.cluster.x-k8s.io
   resources:
   - baremetalclusters/status
   verbs:
   - get
-  - update
   - patch
+  - update
 - apiGroups:
   - infrastructure.cluster.x-k8s.io
   resources:
   - baremetalmachines
   verbs:
+  - create
+  - delete
   - get
   - list
-  - watch
-  - create
-  - update
   - patch
-  - delete
+  - update
+  - watch
 - apiGroups:
   - infrastructure.cluster.x-k8s.io
   resources:
   - baremetalmachines/status
   verbs:
   - get
-  - update
   - patch
+  - update
