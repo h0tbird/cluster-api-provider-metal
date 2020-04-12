@@ -24,7 +24,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrastructurev1alpha1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha1"
+	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 )
 
 // BareMetalMachineReconciler reconciles a BareMetalMachine object
@@ -48,6 +48,6 @@ func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 
 func (r *BareMetalMachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&infrastructurev1alpha1.BareMetalMachine{}).
+		For(&infrastructurev1alpha3.BareMetalMachine{}).
 		Complete(r)
 }

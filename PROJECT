@@ -3,12 +3,6 @@ repo: github.com/h0tbird/cluster-api-provider-metal
 resources:
 - group: infrastructure
   kind: BareMetalCluster
-  version: v1alpha1
-- group: infrastructure
-  kind: BareMetalMachine
-  version: v1alpha1
-- group: infrastructure
-  kind: BareMetalCluster
   version: v1alpha3
 - group: infrastructure
   kind: BareMetalMachine

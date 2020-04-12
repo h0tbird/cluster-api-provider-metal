@@ -16,7 +16,7 @@ spec:
     singular: baremetalmachine
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - name: v1alpha3
     schema:
       openAPIV3Schema:
         description: BareMetalMachine is the Schema for the baremetalmachines API
