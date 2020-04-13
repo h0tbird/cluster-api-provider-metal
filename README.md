@@ -10,7 +10,7 @@ kubebuilder create api --group infrastructure --version v1alpha3 --kind BareMeta
 kubebuilder create api --group infrastructure --version v1alpha3 --kind BareMetalMachine
 ```
 
-Patch the *Makefile*:
+Patch the *Makefile* and the API types:
 ```
 gsed -i 's#controller:latest#registry:5000/cluster-api-capm-controller:latest#' Makefile
 gsed -i 's/controller-gen@v0.2.5/controller-gen@v0.2.8/g' Makefile
@@ -26,9 +26,9 @@ Generate the CRDs with *controller-gen* `0.2.8`:
 rm -f $(which controller-gen) && make manifests
 ```
 
-Install the CRDs into the cluster:
+Deploy the controller and the CRDs:
 ```
-make install
+make deploy
 kubectl apply -f config/samples
 ```
 
