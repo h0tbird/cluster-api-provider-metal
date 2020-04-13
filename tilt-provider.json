@@ -1,7 +1,7 @@
 {
   "name": "metal",
   "config": {
-    "image": "localhost:5000/cluster-api-metal-controller",
+    "image": "registry:5000/controller",
     "live_reload_deps": [
       "main.go", "go.mod", "go.sum", "api", "controllers"
     ]
