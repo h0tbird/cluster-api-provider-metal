@@ -1,6 +1,5 @@
-
 # Image URL to use all building/pushing image targets
-IMG ?= registry:5000/capm-controller:latest
+IMG ?= registry:5000/cluster-api-capm-controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:crdVersions=v1"
 

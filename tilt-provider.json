@@ -1,7 +1,7 @@
 {
   "name": "metal",
   "config": {
-    "image": "registry:5000/capm-controller",
+    "image": "registry:5000/cluster-api-capm-controller",
     "live_reload_deps": [
       "main.go", "go.mod", "go.sum", "api", "controllers"
     ]
