@@ -13,7 +13,7 @@ kubebuilder create api --group infrastructure --version v1alpha3 --kind BareMeta
 Patch the *Makefile* and the API types:
 ```
 gsed -i 's#controller:latest#registry:5000/cluster-api-capm-controller:latest#' Makefile
-gsed -i 's/controller-gen@v0.2.5/controller-gen@v0.2.8/g' Makefile
+gsed -i 's/controller-gen@v0.2.5/controller-gen@v0.2.9/g' Makefile
 gsed -i 's/trivialVersions=true/crdVersions=v1/g' Makefile
 gsed -i '0,/+kubebuilder:object:root=true/s##&\
 // +kubebuilder:subresource:status\
