@@ -2,7 +2,19 @@
 Bare metal CAPI provider
 
 ## Development
-Initial project scaffolding with *kubebuilder* `2.3.1`:
+Start a local kind cluster and registry [link](https://github.com/windmilleng/kind-local/blob/master/kind-with-registry.sh)
+```
+kind-with-registry
+```
+
+Start tilt:
+```
+cd ${CAPI}
+tilt up
+```
+
+## Scaffolding
+Initial project scaffolding using *kubebuilder* `2.3.1`:
 ```
 go mod init github.com/h0tbird/cluster-api-provider-metal
 kubebuilder init --domain cluster.x-k8s.io --license apache2 --owner "Open Source Community"
@@ -21,7 +33,7 @@ gsed -i '0,/+kubebuilder:object:root=true/s##&\
 api/v1alpha3/*_types.go
 ```
 
-Generate the CRDs with *controller-gen* `0.2.8`:
+Generate the CRDs with *controller-gen* `0.2.9`:
 ```
 rm -f $(which controller-gen) && make manifests
 ```
