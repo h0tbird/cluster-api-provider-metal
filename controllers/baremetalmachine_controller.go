@@ -20,11 +20,13 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/cluster-api/util"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
+	infrav1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 )
 
 // BareMetalMachineReconciler reconciles a BareMetalMachine object
@@ -38,16 +40,34 @@ type BareMetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=baremetalmachines/status,verbs=get;update;patch
 
 func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("baremetalmachine", req.NamespacedName)
+	ctx := context.TODO()
+	logger := r.Log.WithValues("namespace", req.Namespace, "baremetalMachine", req.Name)
 
-	// your logic here
+	// Fetch the BareMetalMachine instance.
+	bareMetalMachine := &infrav1.BareMetalMachine{}
+	err := r.Get(ctx, req.NamespacedName, bareMetalMachine)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	// Fetch the Machine instance.
+	machine, err := util.GetOwnerMachine(ctx, r.Client, bareMetalMachine.ObjectMeta)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if machine == nil {
+		logger.Info("Machine Controller has not yet set OwnerRef")
+		return ctrl.Result{}, nil
+	}
 
 	return ctrl.Result{}, nil
 }
 
 func (r *BareMetalMachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&infrastructurev1alpha3.BareMetalMachine{}).
+		For(&infrav1.BareMetalMachine{}).
 		Complete(r)
 }

@@ -38,7 +38,6 @@ var (
 
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
-
 	_ = infrastructurev1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
@@ -54,6 +53,10 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
+	//-------------------------------
+	// Setup the controller manager.
+	//-------------------------------
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
@@ -66,6 +69,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	//---------------------------------------------------------
+	// Setup the BareMetalCluster controller with the manager.
+	//---------------------------------------------------------
+
 	if err = (&controllers.BareMetalClusterReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("BareMetalCluster"),
@@ -74,6 +81,11 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "BareMetalCluster")
 		os.Exit(1)
 	}
+
+	//---------------------------------------------------------
+	// Setup the BareMetalMachine controller with the manager.
+	//---------------------------------------------------------
+
 	if err = (&controllers.BareMetalMachineReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("BareMetalMachine"),
@@ -82,7 +94,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "BareMetalMachine")
 		os.Exit(1)
 	}
+
 	// +kubebuilder:scaffold:builder
+
+	//--------------------
+	// Start the manager.
+	//--------------------
 
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
