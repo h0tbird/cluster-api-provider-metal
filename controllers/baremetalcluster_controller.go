@@ -17,14 +17,20 @@ limitations under the License.
 package controllers
 
 import (
+
+	// Stdlib
 	"context"
 
+	// Community
 	"github.com/go-logr/logr"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/cluster-api/util"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
+	// Local
+	infrav1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 )
 
 // BareMetalClusterReconciler reconciles a BareMetalCluster object
@@ -36,18 +42,39 @@ type BareMetalClusterReconciler struct {
 
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=baremetalclusters,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=baremetalclusters/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=clusters;clusters/status,verbs=get;list;watch
 
+// Reconcile ...
 func (r *BareMetalClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("baremetalcluster", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("namespace", req.Namespace, "baremetalCluster", req.Name)
 
-	// your logic here
+	// Fetch the BareMetalCluster instance.
+	bareMetalCluster := &infrav1.BareMetalCluster{}
+	err := r.Get(ctx, req.NamespacedName, bareMetalCluster)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	// Fetch the Cluster instance.
+	cluster, err := util.GetOwnerCluster(ctx, r.Client, bareMetalCluster.ObjectMeta)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if cluster == nil {
+		log.Info("Cluster Controller has not yet set OwnerRef")
+		return ctrl.Result{}, nil
+	}
 
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager ...
 func (r *BareMetalClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&infrastructurev1alpha3.BareMetalCluster{}).
+		For(&infrav1.BareMetalCluster{}).
 		Complete(r)
 }

@@ -17,8 +17,11 @@ limitations under the License.
 package controllers
 
 import (
+
+	// Stdlib
 	"context"
 
+	// Community
 	"github.com/go-logr/logr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -26,6 +29,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	// Local
 	infrav1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 )
 
@@ -40,9 +44,10 @@ type BareMetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=baremetalmachines/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=machines;machines/status,verbs=get;list;watch
 
+// Reconcile ...
 func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.TODO()
-	logger := r.Log.WithValues("namespace", req.Namespace, "baremetalMachine", req.Name)
+	log := r.Log.WithValues("namespace", req.Namespace, "baremetalMachine", req.Name)
 
 	// Fetch the BareMetalMachine instance.
 	bareMetalMachine := &infrav1.BareMetalMachine{}
@@ -60,13 +65,14 @@ func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 		return ctrl.Result{}, err
 	}
 	if machine == nil {
-		logger.Info("Machine Controller has not yet set OwnerRef")
+		log.Info("Machine Controller has not yet set OwnerRef")
 		return ctrl.Result{}, nil
 	}
 
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager ...
 func (r *BareMetalMachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&infrav1.BareMetalMachine{}).
