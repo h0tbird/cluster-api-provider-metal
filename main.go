@@ -47,15 +47,41 @@ func init() {
 }
 
 func main() {
-	var metricsAddr string
-	var enableLeaderElection bool
-	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
-		"Enable leader election for controller manager. "+
-			"Enabling this will ensure there is only one active controller manager.")
+
+	var (
+		metricsAddr          string
+		enableLeaderElection bool
+		watchNamespace       string
+	)
+
+	flag.StringVar(
+		&metricsAddr,
+		"metrics-addr",
+		":8080",
+		"The address the metric endpoint binds to.",
+	)
+
+	flag.BoolVar(
+		&enableLeaderElection,
+		"enable-leader-election",
+		false,
+		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.",
+	)
+
+	flag.StringVar(
+		&watchNamespace,
+		"namespace",
+		"",
+		"Namespace that the controller watches to reconcile cluster-api objects. If unspecified, the controller watches for cluster-api objects across all namespaces.",
+	)
+
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+
+	if watchNamespace != "" {
+		setupLog.Info("Watching cluster-api objects only in namespace for reconciliation", "namespace", watchNamespace)
+	}
 
 	//-------------------------------
 	// Setup the controller manager.
@@ -67,6 +93,7 @@ func main() {
 		Port:               9443,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "f938d593.cluster.x-k8s.io",
+		Namespace:          watchNamespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
