@@ -17,15 +17,19 @@ limitations under the License.
 package main
 
 import (
+
+	// Stdlib
 	"flag"
 	"os"
 
+	// Community
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	// Local
 	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 	"github.com/h0tbird/cluster-api-provider-metal/controllers"
 	// +kubebuilder:scaffold:imports
