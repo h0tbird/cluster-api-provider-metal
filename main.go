@@ -26,8 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"k8s.io/klog/klogr"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	// Local
 	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
@@ -54,6 +54,10 @@ func main() {
 		watchNamespace       string
 	)
 
+	//---------------------
+	// Command line flags.
+	//---------------------
+
 	flag.StringVar(
 		&metricsAddr,
 		"metrics-addr",
@@ -77,7 +81,11 @@ func main() {
 
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+	//----------------------------------------
+	// Sets the klogr logging implementation.
+	//----------------------------------------
+
+	ctrl.SetLogger(klogr.New())
 
 	if watchNamespace != "" {
 		setupLog.Info("Watching cluster-api objects only in namespace for reconciliation", "namespace", watchNamespace)
