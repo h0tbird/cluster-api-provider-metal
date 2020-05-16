@@ -20,6 +20,8 @@ import (
 
 	// Stdlib
 	"flag"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	// Community
@@ -54,6 +56,7 @@ func main() {
 		enableLeaderElection    bool
 		leaderElectionNamespace string
 		watchNamespace          string
+		profilerAddress         string
 	)
 
 	//---------------------
@@ -90,6 +93,13 @@ func main() {
 		"Namespace that the controller watches to reconcile cluster-api objects. If unspecified, the controller watches for cluster-api objects across all namespaces.",
 	)
 
+	flag.StringVar(
+		&profilerAddress,
+		"profiler-address",
+		"",
+		"Bind address to expose the pprof profiler (e.g. localhost:6060)",
+	)
+
 	flag.Parse()
 
 	//----------------------------------------
@@ -100,6 +110,17 @@ func main() {
 
 	if watchNamespace != "" {
 		setupLog.Info("Watching cluster-api objects only in namespace for reconciliation", "namespace", watchNamespace)
+	}
+
+	//------------------------------
+	// Start the pprof HTTP server.
+	//------------------------------
+
+	if profilerAddress != "" {
+		setupLog.Info("Profiler listening for requests", "profiler-address", profilerAddress)
+		go func() {
+			setupLog.Error(http.ListenAndServe(profilerAddress, nil), "listen and serve error")
+		}()
 	}
 
 	//-------------------------------
