@@ -31,7 +31,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	// Local
-	infrastructurev1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
+	infrav1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
 	"github.com/h0tbird/cluster-api-provider-metal/controllers"
 	// +kubebuilder:scaffold:imports
 )
@@ -43,16 +43,17 @@ var (
 
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
-	_ = infrastructurev1alpha3.AddToScheme(scheme)
+	_ = infrav1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
 func main() {
 
 	var (
-		metricsAddr          string
-		enableLeaderElection bool
-		watchNamespace       string
+		metricsAddr             string
+		enableLeaderElection    bool
+		leaderElectionNamespace string
+		watchNamespace          string
 	)
 
 	//---------------------
@@ -73,6 +74,13 @@ func main() {
 		"enable-leader-election",
 		false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.",
+	)
+
+	flag.StringVar(
+		&leaderElectionNamespace,
+		"leader-election-namespace",
+		"",
+		"Namespace that the controller performs leader election in. If unspecified, the controller will discover which namespace it is running in.",
 	)
 
 	flag.StringVar(
@@ -99,12 +107,13 @@ func main() {
 	//-------------------------------
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		Port:               9443,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "f938d593.cluster.x-k8s.io",
-		Namespace:          watchNamespace,
+		Scheme:                  scheme,
+		MetricsBindAddress:      metricsAddr,
+		Port:                    9443,
+		LeaderElection:          enableLeaderElection,
+		LeaderElectionID:        "controller-leader-election-capm",
+		LeaderElectionNamespace: leaderElectionNamespace,
+		Namespace:               watchNamespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
