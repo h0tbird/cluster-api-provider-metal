@@ -23,6 +23,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"time"
 
 	// Community
 	"k8s.io/apimachinery/pkg/runtime"
@@ -60,6 +61,7 @@ func main() {
 		profilerAddress             string
 		bareMetalClusterConcurrency int
 		bareMetalMachineConcurrency int
+		syncPeriod                  time.Duration
 	)
 
 	//---------------------
@@ -115,6 +117,12 @@ func main() {
 		"Number of BareMetalMachines to process simultaneously",
 	)
 
+	flag.DurationVar(&syncPeriod,
+		"sync-period",
+		10*time.Minute,
+		"The minimum interval at which watched resources are reconciled (e.g. 15m)",
+	)
+
 	flag.Parse()
 
 	//----------------------------------------
@@ -149,6 +157,7 @@ func main() {
 		LeaderElection:          enableLeaderElection,
 		LeaderElectionID:        "controller-leader-election-capm",
 		LeaderElectionNamespace: leaderElectionNamespace,
+		SyncPeriod:              &syncPeriod,
 		Namespace:               watchNamespace,
 	})
 	if err != nil {
