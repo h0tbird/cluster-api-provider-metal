@@ -59,6 +59,7 @@ func main() {
 		watchNamespace              string
 		profilerAddress             string
 		bareMetalClusterConcurrency int
+		bareMetalMachineConcurrency int
 	)
 
 	//---------------------
@@ -106,6 +107,12 @@ func main() {
 		"baremetalcluster-concurrency",
 		5,
 		"Number of BareMetalClusters to process simultaneously",
+	)
+
+	flag.IntVar(&bareMetalMachineConcurrency,
+		"baremetalmachine-concurrency",
+		10,
+		"Number of BareMetalMachines to process simultaneously",
 	)
 
 	flag.Parse()
@@ -170,7 +177,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("BareMetalMachine"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: bareMetalMachineConcurrency}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "BareMetalMachine")
 		os.Exit(1)
 	}

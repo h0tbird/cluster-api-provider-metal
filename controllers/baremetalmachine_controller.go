@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/cluster-api/util"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	// Local
 	infrav1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
@@ -73,8 +74,9 @@ func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 }
 
 // SetupWithManager ...
-func (r *BareMetalMachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *BareMetalMachineReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		WithOptions(options).
 		For(&infrav1.BareMetalMachine{}).
 		Complete(r)
 }
