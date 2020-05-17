@@ -31,6 +31,7 @@ import (
 	"k8s.io/klog"
 	"k8s.io/klog/klogr"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	// Local
 	infrav1alpha3 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
@@ -52,11 +53,12 @@ func init() {
 func main() {
 
 	var (
-		metricsAddr             string
-		enableLeaderElection    bool
-		leaderElectionNamespace string
-		watchNamespace          string
-		profilerAddress         string
+		metricsAddr                 string
+		enableLeaderElection        bool
+		leaderElectionNamespace     string
+		watchNamespace              string
+		profilerAddress             string
+		bareMetalClusterConcurrency int
 	)
 
 	//---------------------
@@ -98,6 +100,12 @@ func main() {
 		"profiler-address",
 		"",
 		"Bind address to expose the pprof profiler (e.g. localhost:6060)",
+	)
+
+	flag.IntVar(&bareMetalClusterConcurrency,
+		"baremetalcluster-concurrency",
+		5,
+		"Number of BareMetalClusters to process simultaneously",
 	)
 
 	flag.Parse()
@@ -149,7 +157,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("BareMetalCluster"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: bareMetalClusterConcurrency}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "BareMetalCluster")
 		os.Exit(1)
 	}
