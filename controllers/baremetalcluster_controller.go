@@ -70,6 +70,14 @@ func (r *BareMetalClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 		return ctrl.Result{}, nil
 	}
 
+	// Cluster is paused or the object has the `paused` annotation.
+	if util.IsPaused(cluster, bareMetalCluster) {
+		log.Info("BareMetalCluster or linked Cluster is marked as paused. Won't reconcile")
+		return ctrl.Result{}, nil
+	}
+	log = log.WithValues("cluster", cluster.Name)
+
+	//
 	return ctrl.Result{}, nil
 }
 

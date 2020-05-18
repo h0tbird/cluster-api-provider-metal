@@ -69,7 +69,26 @@ func (r *BareMetalMachineReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 		log.Info("Machine Controller has not yet set OwnerRef")
 		return ctrl.Result{}, nil
 	}
+	log = log.WithValues("machine", machine.Name)
 
+	// Fetch the Cluster instance.
+	cluster, err := util.GetOwnerCluster(ctx, r.Client, bareMetalMachine.ObjectMeta)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if cluster == nil {
+		log.Info("Cluster Controller has not yet set OwnerRef")
+		return ctrl.Result{}, nil
+	}
+
+	// Cluster is paused or the object has the `paused` annotation.
+	if util.IsPaused(cluster, bareMetalMachine) {
+		log.Info("BareMetalMachine or linked Cluster is marked as paused. Won't reconcile")
+		return ctrl.Result{}, nil
+	}
+	log = log.WithValues("cluster", cluster.Name)
+
+	//
 	return ctrl.Result{}, nil
 }
 
