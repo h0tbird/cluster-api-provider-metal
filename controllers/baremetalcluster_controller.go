@@ -29,6 +29,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	// Local
 	infrav1 "github.com/h0tbird/cluster-api-provider-metal/api/v1alpha3"
@@ -55,30 +56,30 @@ func (r *BareMetalClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, e
 	err := r.Get(ctx, req.NamespacedName, bareMetalCluster)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			return ctrl.Result{}, nil
+			return reconcile.Result{}, nil
 		}
-		return ctrl.Result{}, err
+		return reconcile.Result{}, err
 	}
 
 	// Fetch the Cluster instance.
 	cluster, err := util.GetOwnerCluster(ctx, r.Client, bareMetalCluster.ObjectMeta)
 	if err != nil {
-		return ctrl.Result{}, err
+		return reconcile.Result{}, err
 	}
 	if cluster == nil {
 		log.Info("Cluster Controller has not yet set OwnerRef")
-		return ctrl.Result{}, nil
+		return reconcile.Result{}, nil
 	}
 
-	// Cluster is paused or the object has the `paused` annotation.
+	// Cluster is paused or the object has the 'paused' annotation.
 	if util.IsPaused(cluster, bareMetalCluster) {
 		log.Info("BareMetalCluster or linked Cluster is marked as paused. Won't reconcile")
-		return ctrl.Result{}, nil
+		return reconcile.Result{}, nil
 	}
 	log = log.WithValues("cluster", cluster.Name)
 
-	//
-	return ctrl.Result{}, nil
+	// Do not requeue.
+	return reconcile.Result{}, nil
 }
 
 // SetupWithManager ...
