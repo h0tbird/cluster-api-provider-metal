@@ -25,8 +25,8 @@ kubebuilder create api --group infrastructure --version v1alpha3 --kind BareMeta
 
 Patch the *Makefile* and the API types:
 ```
-sed -i 's#controller:latest#registry:5000/cluster-api-capm-controller:latest#' Makefile
-sed -i 's/controller-gen@v0.2.5/controller-gen@v0.3.0/g' Makefile
+sed -i 's#controller:latest#localhost:5000/cluster-api-capm-controller:latest#' Makefile
+sed -i 's/controller-gen@v0.2.5/controller-gen@v0.4.0/g' Makefile
 sed -i 's/trivialVersions=true/crdVersions=v1/g' Makefile
 sed -i '0,/+kubebuilder:object:root=true/s##&\
 // +kubebuilder:subresource:status\
@@ -34,7 +34,7 @@ sed -i '0,/+kubebuilder:object:root=true/s##&\
 api/v1alpha3/*_types.go
 ```
 
-Generate the CRDs with *[controller-gen](https://github.com/kubernetes-sigs/controller-tools)* `0.3.0`:
+Generate the CRDs with *[controller-gen](https://github.com/kubernetes-sigs/controller-tools)*:
 ```
 rm -f $(which controller-gen) && make manifests
 ```
