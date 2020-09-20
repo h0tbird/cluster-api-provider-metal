@@ -2,9 +2,10 @@
 Bare metal CAPI provider
 
 ## Development
-Start a local kind cluster and registry [link](https://github.com/windmilleng/kind-local/blob/master/kind-with-registry.sh)
 ```
-kind-with-registry
+curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/kind-with-registry.sh > ~/bin/kind-local
+chmod +x ~/bin/kind-local
+kind-local
 ```
 
 Start tilt:
