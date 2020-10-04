@@ -107,7 +107,7 @@ k config view --flatten | sponge ${KUBECONFIG}
 Deploy a CNI solution:
 ```
 until k wait --timeout=120s --for=condition=Ready pod -l k8s-app!=kube-dns --all -A && \
-k apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
+k apply -f https://docs.projectcalico.org/v3.16/manifests/calico.yaml && \
 k wait --timeout=120s --for=condition=Ready pod --all -A; do :; done
 ```
 
