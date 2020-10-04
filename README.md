@@ -87,13 +87,16 @@ clusterctl config cluster ${CLUSTER} --flavor development \
 k apply -f -
 ```
 
-Upsert the kubeconfig:
+Get the kubeconfig:
 ```
 clusterctl get kubeconfig ${CLUSTER} | sed -e "
   s/server:.*/server: https:\/\/$(docker port ${CLUSTER}-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")/g;
   s/certificate-authority-data:.*/insecure-skip-tls-verify: true/g;
 " > /tmp/${CLUSTER}.kubeconfig
+```
 
+Upsert the kubeconfig:
+```
 KUBECONFIG=/tmp/${CLUSTER}.kubeconfig:${KUBECONFIG} \
 k config view --flatten | sponge ${KUBECONFIG}
 ```
