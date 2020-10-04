@@ -91,8 +91,7 @@ clusterctl get kubeconfig ${CLUSTER} | sed -e "
   s/server:.*/server: https:\/\/$(docker port ${CLUSTER}-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")/g;
   s/certificate-authority-data:.*/insecure-skip-tls-verify: true/g;
 " > /tmp/${CLUSTER}.kubeconfig
-KUBECONFIG=${KUBECONFIG}:/tmp/${CLUSTER}.kubeconfig kubectl config view --flatten | sponge ${KUBECONFIG}
-kubectl config use-context ${CLUSTER}-admin@${CLUSTER}
+KUBECONFIG=/tmp/${CLUSTER}.kubeconfig:${KUBECONFIG} kubectl config view --flatten | sponge ${KUBECONFIG}
 kubectl wait --for=condition=Ready pod --all -A
 ```
 
