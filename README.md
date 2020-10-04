@@ -113,3 +113,9 @@ Verify:
 k config use-context kind-kind
 k get cluster,kubeadmcontrolplane -A
 ```
+
+List kind clusters:
+```
+kind get clusters
+docker ps -a --filter label=io.x-k8s.kind.cluster --format '{{.Label "io.x-k8s.kind.cluster"}}' | sort -u
+```
