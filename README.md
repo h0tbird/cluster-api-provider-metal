@@ -54,3 +54,50 @@ cat > tilt-settings.json << EOF
 }
 EOF
 ```
+
+## Use `kind` and `clusterctl` to deploy CAPD clusters
+
+Allow CAPD to use the local docker:
+```
+KIND_EXPERIMENTAL_DOCKER_NETWORK=bridge kind create cluster --config <(
+echo "kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraMounts:
+    - hostPath: /var/run/docker.sock
+      containerPath: /var/run/docker.sock") && \
+while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+```
+
+Deploy the management cluster:
+```
+clusterctl init -v 1 --infrastructure docker && \
+while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+```
+
+Deploy a workload `CLUSTER=foo`:
+```
+clusterctl config cluster ${CLUSTER} --flavor development \
+--kubernetes-version v1.19.1 \
+--control-plane-machine-count=1 \
+--worker-machine-count=2 | \
+kubectl apply -f -
+```
+
+Upsert the kubeconfig:
+```
+clusterctl get kubeconfig ${CLUSTER} | sed -e "
+  s/server:.*/server: https:\/\/$(docker port ${CLUSTER}-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")/g;
+  s/certificate-authority-data:.*/insecure-skip-tls-verify: true/g;
+" > /tmp/${CLUSTER}.kubeconfig
+KUBECONFIG=${KUBECONFIG}:/tmp/${CLUSTER}.kubeconfig kubectl config view --flatten | sponge ${KUBECONFIG}
+kubectl config use-context ${CLUSTER}-admin@${CLUSTER}
+kubectl wait --for=condition=Ready pod --all -A
+```
+
+Deploy a CNI solution:
+```
+kubectl apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
+while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+```
