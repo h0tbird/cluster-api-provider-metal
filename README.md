@@ -69,18 +69,20 @@ nodes:
   extraMounts:
     - hostPath: /var/run/docker.sock
       containerPath: /var/run/docker.sock") && \
-while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+k wait --timeout=120s --for=condition=Ready pod --all -A
 ```
 
 Deploy the management cluster:
 ```
 clusterctl init -v 1 --infrastructure docker && \
-while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+k wait --timeout=120s --for=condition=Ready pod --all -A
 ```
 
 Deploy a workload `CLUSTER=foo`:
 ```
+k create ns ${CLUSTER} && \
 clusterctl config cluster ${CLUSTER} \
+--target-namespace ${CLUSTER} \
 --flavor development \
 --kubernetes-version v1.19.1 \
 --control-plane-machine-count=1 \
@@ -90,7 +92,7 @@ k apply -f -
 
 Get the kubeconfig:
 ```
-clusterctl get kubeconfig ${CLUSTER} | sed -e "
+clusterctl get kubeconfig ${CLUSTER} -n ${CLUSTER} | sed -e "
   s/server:.*/server: https:\/\/$(docker port ${CLUSTER}-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")/g;
   s/certificate-authority-data:.*/insecure-skip-tls-verify: true/g;
 " > /tmp/${CLUSTER}.kubeconfig
@@ -104,8 +106,9 @@ k config view --flatten | sponge ${KUBECONFIG}
 
 Deploy a CNI solution:
 ```
+until k wait --timeout=120s --for=condition=Ready pod -l k8s-app!=kube-dns --all -A && \
 k apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
-while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+k wait --timeout=120s --for=condition=Ready pod --all -A; do :; done
 ```
 
 Verify:
