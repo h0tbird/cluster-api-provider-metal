@@ -57,7 +57,7 @@ cat > tilt-settings.json << EOF
 EOF
 ```
 
-## Use `kind` and `clusterctl` to deploy CAPD clusters
+## Use `kind` and `clusterctl` to deploy a CAPD cluster
 
 Allow CAPD to use the local docker:
 ```
@@ -80,7 +80,8 @@ while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
 
 Deploy a workload `CLUSTER=foo`:
 ```
-clusterctl config cluster ${CLUSTER} --flavor development \
+clusterctl config cluster ${CLUSTER} \
+--flavor development \
 --kubernetes-version v1.19.1 \
 --control-plane-machine-count=1 \
 --worker-machine-count=2 | \
