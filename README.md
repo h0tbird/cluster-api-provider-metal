@@ -67,13 +67,13 @@ nodes:
   extraMounts:
     - hostPath: /var/run/docker.sock
       containerPath: /var/run/docker.sock") && \
-while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
 ```
 
 Deploy the management cluster:
 ```
 clusterctl init -v 1 --infrastructure docker && \
-while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
 ```
 
 Deploy a workload `CLUSTER=foo`:
@@ -82,7 +82,7 @@ clusterctl config cluster ${CLUSTER} --flavor development \
 --kubernetes-version v1.19.1 \
 --control-plane-machine-count=1 \
 --worker-machine-count=2 | \
-kubectl apply -f -
+k apply -f -
 ```
 
 Upsert the kubeconfig:
@@ -91,12 +91,13 @@ clusterctl get kubeconfig ${CLUSTER} | sed -e "
   s/server:.*/server: https:\/\/$(docker port ${CLUSTER}-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")/g;
   s/certificate-authority-data:.*/insecure-skip-tls-verify: true/g;
 " > /tmp/${CLUSTER}.kubeconfig
-KUBECONFIG=/tmp/${CLUSTER}.kubeconfig:${KUBECONFIG} kubectl config view --flatten | sponge ${KUBECONFIG}
-kubectl wait --for=condition=Ready pod --all -A
+
+KUBECONFIG=/tmp/${CLUSTER}.kubeconfig:${KUBECONFIG} \
+k config view --flatten | sponge ${KUBECONFIG}
 ```
 
 Deploy a CNI solution:
 ```
-kubectl apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
-while ! kubectl wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+k apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
+while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
 ```
