@@ -2,6 +2,8 @@
 Bare metal CAPI provider
 
 ## Development
+
+Start kind:
 ```
 curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/kind-with-registry.sh > ~/bin/kind-local
 chmod +x ~/bin/kind-local
@@ -100,4 +102,10 @@ Deploy a CNI solution:
 ```
 k apply -f https://docs.projectcalico.org/v3.15/manifests/calico.yaml && \
 while ! k wait --for=condition=Ready pod --all -A; do echo "Wait again"; done
+```
+
+Verify:
+```
+k config use-context kind-kind
+k get cluster,kubeadmcontrolplane -A
 ```
