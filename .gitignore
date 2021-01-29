@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+cluster-api-provider-metal
 
 # Test binary, built with `go test -c`
 *.test
